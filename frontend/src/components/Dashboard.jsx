@@ -5,14 +5,23 @@ import {
     AlertCircle, Calendar, Megaphone, Send, LayoutDashboard, Bell 
 } from "lucide-react";
 import PostAlertModal from "./PostAlertModal";
+import Sidebar from "./Sidebar";
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const token = localStorage.getItem("userToken");
     const [alerts, setAlerts] = useState([]);
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
     const [selectedAlert, setSelectedAlert] = useState(null);
     
-    // Auth check - moved to conditional render
+    // Auth guard
+    useEffect(() => {
+        if (!token) {
+            navigate("/login");
+        }
+    }, [token, navigate]);
+
+    if (!token) return null;
 
     
     // NEW: Announcements States
@@ -54,11 +63,11 @@ export default function Dashboard() {
     const handlePostNews = async () => {
         if (!newsText.trim()) return;
         try {
-            const response = await fetch("import.meta.env.VITE_API_URL/api/post-announcement", {
+            const response = await fetch("/api/post-announcement", {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("userToken")}`
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({ message: newsText })
             });
@@ -84,10 +93,10 @@ export default function Dashboard() {
 
     const verifyAlert = async (alertId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/verify-alert/${alertId}`, {
+            const response = await fetch(`/api/verify-alert/${alertId}`, {
                 method: "PATCH",
                 headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("userToken")}`
+                    "Authorization": `Bearer ${token}`
                 }
             });
             if (response.ok) {

@@ -15,12 +15,12 @@ const updateProfileHandler = require('../api/update_profile');
 
 router.post('/signup', signupHandler);
 router.post('/quicksetup', quickSetupHandler); 
-router.post('/post_alert', authMiddleware, postAlertHandler); 
+router.post('/post_alert', postAlertHandler); 
 router.get('/get_alert', getAlertsHandler);
 router.post('/login', loginHandler);
-router.patch('/verify-alert/:id', verifyAlertHandler);
+router.patch('/verify-alert/:id', authMiddleware, verifyAlertHandler);
 router.get('/get_announcements', getAnnouncementsHandler);
-router.post('/post-announcement', postAnnouncementHandler);
+router.post('/post-announcement', authMiddleware, postAnnouncementHandler);
 
 router.get('/user-profile', getUserProfileHandler);
 router.put('/update-profile', updateProfileHandler);

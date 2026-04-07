@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // Uses the Master Blueprint
-const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key"; 
+const SECRET_KEY = process.env.JWT_SECRET || "SafeNeighbour_Primary_Secret_99#";
 
 const signupHandler = async (req, res) => {
     try {

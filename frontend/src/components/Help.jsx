@@ -1,7 +1,20 @@
-import { NavLink, Link } from "react-router-dom"; // CHANGED: Added NavLink to handle active link states
-import { LifeBuoy, CheckCircle, AlertCircle, ShieldCheck, Mail, Bell, LayoutDashboard } from "lucide-react"; // CHANGED: Added LayoutDashboard and Bell to prevent ReferenceErrors
+import { useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import { LifeBuoy, CheckCircle, AlertCircle, ShieldCheck, Mail, Bell, LayoutDashboard } from "lucide-react";
 
 export default function Help() {  
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("userToken");
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
+  if (!token) return null;
+
   const getLinkStyle = ({ isActive }) => 
     `flex items-center gap-3 px-4 py-3 rounded-xl transition border ${
       isActive 
@@ -12,7 +25,7 @@ export default function Help() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pt-16">
       <div className="flex">
-
+        <Sidebar />
 
         {/* Main Content */}
         <main className="flex-1 ml-64 p-8">
@@ -27,7 +40,7 @@ export default function Help() {
               </p>
             </div>
 
-            <div className="space-y-12">
+            <div className="space-y-12"> 
               {/* Login/Signup Section */}
               <section id="login">
                 <div className="bg-white rounded-3xl p-10 shadow-2xl border border-slate-100">

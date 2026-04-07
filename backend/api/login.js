@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
+const SECRET_KEY = process.env.JWT_SECRET || "SafeNeighbour_Primary_Secret_99#";
 
 const loginHandler = async (req, res) => {
     try {
@@ -12,7 +12,7 @@ const loginHandler = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { userId: user._id, email: user.email }, 
+            { userId: user._id, email: user.email, role: user.role }, 
             SECRET_KEY, 
             { expiresIn: '1h' }
         );

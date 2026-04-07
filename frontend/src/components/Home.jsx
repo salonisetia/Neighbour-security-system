@@ -1,9 +1,17 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { ShieldCheck, UserCircle, LayoutDashboard, Bell, Settings, ArrowRight, LifeBuoy } from "lucide-react";  
 
 export default function Home() {
+    const navigate = useNavigate();
     const token = localStorage.getItem("userToken");
+
+    useEffect(() => {
+        if (token) {
+            navigate("/dashboard");
+        }
+    }, [token, navigate]);
+
     return (
         <div className="min-h-screen bg-white font-sans flex flex-col">
             
@@ -24,7 +32,6 @@ export default function Home() {
 
             <div className="flex flex-1 pt-16">
                 
-
 
                 {/* 3. HERO SECTION */}
                 <main className="flex-1 flex flex-col items-center justify-center p-12 w-full">
