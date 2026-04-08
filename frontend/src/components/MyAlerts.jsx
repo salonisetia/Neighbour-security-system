@@ -12,24 +12,27 @@ const MyAlerts = () => {
     const token = localStorage.getItem('userToken'); 
 
     useEffect(() => {
-        const fetchAlerts = async () => {
-            if (!token) {
-                setLoading(false);
-                return;
-            }
-            try {
-                const res = await axios.get('http://localhost:5000/api/my-alerts', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setAlerts(res.data);
-            } catch (err) {
-                console.error("Error fetching alerts", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchAlerts();
-    }, [token]);
+    const fetchAlerts = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        
+        
+        const res = await axios.get(`${API_URL}/api/get_my_alerts`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAlerts(res.data);
+      } catch (err) {
+        console.error("Error fetching alerts", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAlerts();
+  }, [token]);
 
     const alertStyles = {
         info: { container: 'bg-blue-50 border-blue-200 text-blue-800', icon: <Info className="w-5 h-5 text-blue-500" /> },

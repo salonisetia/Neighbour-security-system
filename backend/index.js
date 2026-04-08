@@ -2,17 +2,22 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
+
+// Import handlers for specific API endpoints
 const getAnnouncementsHandler = require('./api/get_announcements'); 
 const postAnnouncementHandler = require('./api/post_announcement');
+const getMyAlertsHandler = require('./api/get_my_alerts'); // Added this for your "My Alerts" page
 
 require('dotenv').config();
 
 const app = express();
 
-// CORS configuration
+// ✅ FIX 1: Explicit CORS Configuration
+// Using 'origin: true' works, but specifying your frontend URL is safer for production
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: ["https://neighbour-security-system.vercel.app", "http://localhost:5173"], 
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 })); 
 
 app.use(express.json()); 
@@ -20,15 +25,23 @@ app.use(express.json());
 // MongoDB connection
 const mongoURI = process.env.MONGO_URI || 'mongodb+srv://saloni:KEjr7FehAX3oaC8C@neighbourhood-security.kcujzhs.mongodb.net/security_db?retryWrites=true&w=majority';
 
-mongoose.connect(mongoURI)
+// ✅ FIX 2: Optimized MongoDB connection for Serverless
+mongoose.connect(mongoURI, {
+    serverSelectionTimeoutMS: 5000 // Fails fast if DB is down instead of hanging
+})
   .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch(err => console.log("❌ MongoDB Connection Error: ", err));
 
 // Routes
-// Routes
 app.use('/api', authRoutes);
 
-// Global error handler for unhandled rejections
+// ✅ FIX 3: Map your standalone handlers to routes
+// These ensure that when the frontend calls /api/get_announcements, the right file handles it
+app.get('/api/get_announcements', getAnnouncementsHandler);
+app.post('/api/post_announcement', postAnnouncementHandler);
+app.get('/api/get_my_alerts', getMyAlertsHandler);
+
+// Global error handler
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
@@ -40,4 +53,3 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = app; // Required for Vercel
-

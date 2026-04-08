@@ -20,7 +20,8 @@ const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password, location, role } = formData;
     try {
-        const response = await fetch('http://localhost:5000/api/signup', {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const response = await fetch(`${API_URL}/api/sign_up`, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, location, role }) 
@@ -29,17 +30,15 @@ const handleSubmit = async (e) => {
         const data = await response.json();
 
         if (response.ok) {
-            // alert("Signup successful! Your data is saved in MongoDB Atlas.");
             localStorage.setItem("userToken", data.token);
-         window.location.href ="/dashboard";
+            window.location.href ="/dashboard";
         } else {
             alert("Signup failed: " + data.error);
         }
     } catch (error) {
         console.error("Connection error:", error);
-        alert("Server is not running. Please start your backend.");
+        alert("Network error. Please try again.");
     }
-    console.log("Form submitted:", formData);
 };
 
     return (

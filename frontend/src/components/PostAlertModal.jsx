@@ -25,7 +25,8 @@ export default function PostAlertModal({ isOpen, onClose }) {
         delete payload.photo;  // Remove unused photo field
 
         try {
-            const response = await fetch("/api/post_alert", {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${API_URL}/api/post_alert`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
