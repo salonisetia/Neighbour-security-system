@@ -54,9 +54,23 @@ app.post('/api/post_alert', postAlertHandler); // Fixes the Alert posting issue
 app.get('/api/get_my_alerts', getMyAlertsHandler);
 app.patch('/api/verify-alert/:id', verifyAlertHandler);
 
-// Health check route
+// Health check + DB health
+app.get('/api/health', async (req, res) => {
+  try {
+    const userCount = await mongoose.connection.db.collection('users').countDocuments();
+    res.json({ 
+      status: 'OK', 
+      dbConnected: mongoose.connection.readyState === 1,
+      userCount,
+      message: 'Backend healthy'
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'DB Error', error: error.message });
+  }
+});
+
 app.get('/', (req, res) => {
-  res.send("🚀 Neighbor Security API is live and connected!");
+  res.send("🚀 Neighbor Security API is live! Visit /api/health");
 });
 
 // Global error handler for unhandled promise rejections
