@@ -18,7 +18,10 @@ const [showPassword, setShowPassword] = useState(false);
     const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+        // ✅ Add this line to get your backend URL
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+        // ✅ Update the fetch call to use the API_URL variable
         const response = await fetch(`${API_URL}/api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -28,11 +31,9 @@ const [showPassword, setShowPassword] = useState(false);
         const data = await response.json();
 
         if (response.ok) {
-            // Save the token exactly how your Dashboard/PostAlertModal expects it
-localStorage.setItem("userToken", data.token);
-localStorage.setItem("userRole", data.role || 'resident');
-console.log('LOGIN DEBUG - stored role:', data.role, 'localStorage:', localStorage.getItem("userRole"));
-alert(data.message || "Login successful");
+            localStorage.setItem("userToken", data.token);
+            localStorage.setItem("userRole", data.role || 'resident');
+            alert(data.message || "Login successful");
             navigate("/dashboard");
         } else {
             alert(data.error || "Login failed");
