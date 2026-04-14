@@ -3,17 +3,19 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 
-// Import handlers for specific API endpoints
+// ✅ Import handlers for all API endpoints
 const getAnnouncementsHandler = require('./api/get_announcements'); 
 const postAnnouncementHandler = require('./api/post_announcement');
-const getMyAlertsHandler = require('./api/get_my_alerts'); // Added this for your "My Alerts" page
+const getAlertsHandler = require('./api/get_alert'); // Added for general feed
+const postAlertHandler = require('./api/post_alert'); // Added to handle new posts
+const getMyAlertsHandler = require('./api/get_my_alerts'); 
+const verifyAlertHandler = require('./api/verify_alert'); // Added for admin verification
 
 require('dotenv').config();
 
 const app = express();
 
-// ✅ FIX 1: Explicit CORS Configuration
-// Using 'origin: true' works, but specifying your frontend URL is safer for production
+// ✅ CORS Configuration: Explicitly allowing your frontend domains
 app.use(cors({
   origin: [
     "https://neighbour-security-system-2u2t.vercel.app", 
@@ -27,37 +29,45 @@ app.use(cors({
 
 app.use(express.json()); 
 
-// MongoDB connection
+// MongoDB connection with fallback
 const mongoURI = process.env.MONGO_URI || 'mongodb+srv://saloni:KEjr7FehAX3oaC8C@neighbourhood-security.kcujzhs.mongodb.net/security_db?retryWrites=true&w=majority';
 
-// ✅ FIX 2: Optimized MongoDB connection for Serverless
+// ✅ Optimized MongoDB connection for Vercel Serverless
 mongoose.connect(mongoURI, {
-    serverSelectionTimeoutMS: 5000 // Fails fast if DB is down instead of hanging
+    serverSelectionTimeoutMS: 5000,
+    connectTimeoutMS: 10000 
 })
   .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch(err => console.log("❌ MongoDB Connection Error: ", err));
 
-// Routes
+// Standard Auth Routes (Login, Signup)
 app.use('/api', authRoutes);
 
-// ✅ FIX 3: Map your standalone handlers to routes
-// These ensure that when the frontend calls /api/get_announcements, the right file handles it
+// ✅ API Route Mapping
+// These map the frontend requests to your standalone API files
 app.get('/api/get_announcements', getAnnouncementsHandler);
 app.post('/api/post_announcement', postAnnouncementHandler);
+
+app.get('/api/get_alert', getAlertsHandler); // Fixes the Dashboard loading issue
+app.post('/api/post_alert', postAlertHandler); // Fixes the Alert posting issue
+
 app.get('/api/get_my_alerts', getMyAlertsHandler);
+app.patch('/api/verify-alert/:id', verifyAlertHandler);
+
+// Health check route
 app.get('/', (req, res) => {
   res.send("🚀 Neighbor Security API is live and connected!");
 });
 
-// Global error handler
+// Global error handler for unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-// Local dev server
+// Local development server configuration
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
 }
 
-module.exports = app; // Required for Vercel
+module.exports = app; // Export for Vercel deployment

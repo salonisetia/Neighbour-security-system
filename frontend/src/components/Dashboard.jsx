@@ -39,23 +39,22 @@ export default function Dashboard() {
     const categories = ["All", "Accident", "Theft", "Fire", "Medical", "Suspicious Activity"];
 
     // Fetch alerts and announcements from the backend
+    const fetchData = async () => {
+        try {
+            // Fetch Alerts
+            const alertResponse = await fetch(`${API_URL}/api/get_alert`);
+            const alertData = await alertResponse.json();
+            if (alertResponse.ok) setAlerts(alertData);
+
+            // Fetch Announcements
+            const newsResponse = await fetch(`${API_URL}/api/get_announcements`);
+            const newsData = await newsResponse.json();
+            if (newsResponse.ok) setAnnouncements(newsData);
+        } catch (error) {
+            console.error("Failed to fetch data:", error);
+        }
+    };
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // 1. Fetch Alerts - Updated with API_URL
-                const alertResponse = await fetch(`${API_URL}/api/get_alert`);
-                const alertData = await alertResponse.json();
-                if (alertResponse.ok) setAlerts(alertData);
-
-                // 2. Fetch Announcements (News) - Updated with API_URL
-                const newsResponse = await fetch(`${API_URL}/api/get_announcements`);
-                const newsData = await newsResponse.json();
-                if (newsResponse.ok) setAnnouncements(newsData);
-
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-            }
-        };
         fetchData();
     }, [API_URL]);
 

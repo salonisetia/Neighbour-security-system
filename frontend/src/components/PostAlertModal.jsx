@@ -1,7 +1,7 @@
-// frontend/src/components/PostAlertModal.jsx
 import { useState } from "react";
 
-export default function PostAlertModal({ isOpen, onClose }) {
+// ✅ Destructure onAlertAdded from props
+export default function PostAlertModal({ isOpen, onClose, onAlertAdded }) {
     const [alertData, setAlertData] = useState({
         category: "Accident",
         title: "",
@@ -30,7 +30,7 @@ export default function PostAlertModal({ isOpen, onClose }) {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-"Authorization": `Bearer ${localStorage.getItem('userToken')}`
+                    "Authorization": `Bearer ${localStorage.getItem('userToken')}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -39,8 +39,16 @@ export default function PostAlertModal({ isOpen, onClose }) {
             
             if (response.ok) {
                 alert("Alert Posted Successfully!");
-                if (onClose) onClose();  // Close modal properly
-                window.dispatchEvent(new CustomEvent('alertPosted'));  // Notify dashboard
+                
+                // ✅ Call the refresh function passed from Dashboard.jsx
+                if (onAlertAdded) {
+                    await onAlertAdded();
+                }
+                
+                // Optional: keep as a backup for other components
+                window.dispatchEvent(new CustomEvent('alertPosted')); 
+                
+                onClose(); // Close modal on success
             } else {
                 alert(`Error: ${result.error || 'Failed to post alert'}`);
             }
