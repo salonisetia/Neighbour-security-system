@@ -15,9 +15,14 @@ const app = express();
 // ✅ FIX 1: Explicit CORS Configuration
 // Using 'origin: true' works, but specifying your frontend URL is safer for production
 app.use(cors({
-  origin: ["https://neighbour-security-system.vercel.app", "http://localhost:5173"], 
+  origin: [
+    "https://neighbour-security-system-2u2t.vercel.app", 
+    "https://neighbour-security-system.vercel.app", 
+    "http://localhost:5173"
+  ], 
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 })); 
 
 app.use(express.json()); 
