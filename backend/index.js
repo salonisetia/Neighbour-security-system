@@ -40,6 +40,9 @@ app.use('/api', authRoutes);
 app.get('/api/get_announcements', getAnnouncementsHandler);
 app.post('/api/post_announcement', postAnnouncementHandler);
 app.get('/api/get_my_alerts', getMyAlertsHandler);
+app.get('/', (req, res) => {
+  res.send("🚀 Neighbor Security API is live and connected!");
+});
 
 // Global error handler
 process.on('unhandledRejection', (reason, promise) => {
