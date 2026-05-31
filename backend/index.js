@@ -16,16 +16,17 @@ require('dotenv').config();
 const app = express();
 
 // ✅ CORS Configuration: Explicitly allowing your frontend domains
-app.use(cors({
-  origin: [
-    "https://neighbour-security-system-2u2t.vercel.app", 
-    "https://neighbour-security-system.vercel.app", 
-    "http://localhost:5173"
-  ], 
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-})); 
+// app.use(cors({
+//   origin: [
+//     "https://neighbour-security-system-2u2t.vercel.app", 
+//     "https://neighbour-security-system.vercel.app", 
+//     "http://localhost:5173"
+//   ], 
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"]
+// })); 
+app.use(cors());
 
 app.use(express.json()); 
 

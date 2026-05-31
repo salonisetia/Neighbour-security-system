@@ -15,7 +15,8 @@ export default function Dashboard() {
     const [selectedAlert, setSelectedAlert] = useState(null);
     
     // ✅ Setup the API URL from environment variables
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    // const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = 'http://localhost:5000';
 
     // Auth guard
     useEffect(() => {
@@ -204,7 +205,38 @@ export default function Dashboard() {
                                         onClick={() => setSelectedAlert(alert)}
                                         className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group relative overflow-hidden"
                                     >
-                                        {/* ... alert card content ... */}
+                                        <div className="flex items-center justify-between gap-3 mb-4">
+                                            <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">
+                                                {alert.category || 'General'}
+                                            </span>
+                                            <span className={`text-[11px] font-semibold uppercase rounded-full px-3 py-1 ${alert.status === 'verified' ? 'bg-emerald-100 text-emerald-700' : alert.status === 'resolved' ? 'bg-slate-100 text-slate-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                {alert.status || 'pending'}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-3">
+                                            {alert.title || 'Security Alert'}
+                                        </h3>
+                                        <p className="text-sm text-slate-600 mb-4">
+                                            {alert.message || alert.description || 'No details available for this alert.'}
+                                        </p>
+                                        <div className="grid gap-3 sm:grid-cols-2 text-[13px] text-slate-500">
+                                            <span className="flex items-center gap-2">
+                                                <MapPin className="h-4 w-4" />
+                                                {alert.location?.address || 'Location not specified'}
+                                            </span>
+                                            <span className="flex items-center gap-2">
+                                                <Clock className="h-4 w-4" />
+                                                {new Date(alert.createdAt).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        {userRole === 'admin' && alert.status !== 'verified' && (
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); verifyAlert(alert._id); }}
+                                                className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition"
+                                            >
+                                                Verify
+                                            </button>
+                                        )}
                                     </div>
                                 ))}
                             </div>

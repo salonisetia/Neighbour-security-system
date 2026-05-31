@@ -9,8 +9,14 @@ const postAlertHandler = async (req, res) => {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, SECRET_KEY);
-    
+    let decoded;
+    try {
+      decoded = jwt.verify(token, SECRET_KEY);
+    } catch (jwtError) {
+      console.error('JWT verification failed:', jwtError.message);
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
     const { category, title, description, location } = req.body;
     if (!category || !location?.address) {
       return res.status(400).json({ error: 'Category and location required' });

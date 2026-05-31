@@ -25,32 +25,40 @@ export default function PostAlertModal({ isOpen, onClose, onAlertAdded }) {
         delete payload.photo;  // Remove unused photo field
 
         try {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                alert("You must be logged in to post an alert.");
+                setIsSubmitting(false);
+                return;
+            }
+
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
             const response = await fetch(`${API_URL}/api/post_alert`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('userToken')}`
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(payload)
             });
 
             const result = await response.json();
-            
             if (response.ok) {
                 alert("Alert Posted Successfully!");
-                
-                // ✅ Call the refresh function passed from Dashboard.jsx
                 if (onAlertAdded) {
                     await onAlertAdded();
                 }
-                
-                // Optional: keep as a backup for other components
-                window.dispatchEvent(new CustomEvent('alertPosted')); 
-                
-                onClose(); // Close modal on success
+                window.dispatchEvent(new CustomEvent('alertPosted'));
+                onClose();
             } else {
-                alert(`Error: ${result.error || 'Failed to post alert'}`);
+                console.error('Alert post failed:', response.status, result);
+                if (response.status === 401) {
+                    localStorage.removeItem('userToken');
+                    alert('Session expired or invalid token. Please log in again.');
+                    window.location.href = '/login';
+                    return;
+                }
+                alert(`Error: ${result.error || result.message || 'Failed to post alert'}`);
             }
         } catch (error) {
             console.error("Error posting alert:", error);

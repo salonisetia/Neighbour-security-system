@@ -1,44 +1,50 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate, Link } from "react-router-dom";
-import { AlertCircle, CheckCircle2, Info, XCircle, Lock } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Info, XCircle, Lock, MapPin, Clock } from 'lucide-react';
 import Sidebar from './Sidebar';
-import MyAlertsSidebar from './MyAlertsSidebar';
 
 const MyAlerts = () => {
+    const navigate = useNavigate();
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Use "userToken" to match your Navbar.jsx implementation
     const token = localStorage.getItem('userToken'); 
 
     useEffect(() => {
     const fetchAlerts = async () => {
       if (!token) {
         setLoading(false);
+        navigate('/login');
         return;
       }
       try {
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        
-        
         const res = await axios.get(`${API_URL}/api/get_my_alerts`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setAlerts(res.data);
+        setAlerts(res.data || []);
       } catch (err) {
         console.error("Error fetching alerts", err);
+        if (err.response?.status === 401) {
+          localStorage.removeItem('userToken');
+          alert('Session expired or invalid token. Please log in again.');
+          navigate('/login');
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchAlerts();
-  }, [token]);
+  }, [token, navigate]);
 
     const alertStyles = {
-        info: { container: 'bg-blue-50 border-blue-200 text-blue-800', icon: <Info className="w-5 h-5 text-blue-500" /> },
-        success: { container: 'bg-green-50 border-green-200 text-green-800', icon: <CheckCircle2 className="w-5 h-5 text-green-500" /> },
-        warning: { container: 'bg-amber-50 border-amber-200 text-amber-800', icon: <AlertCircle className="w-5 h-5 text-amber-500" /> },
-        error: { container: 'bg-red-50 border-red-200 text-red-800', icon: <XCircle className="w-5 h-5 text-red-500" /> },
+        Accident: { container: 'bg-amber-50 border-amber-200 text-amber-800', icon: <AlertCircle className="w-5 h-5 text-amber-500" /> },
+        Theft: { container: 'bg-red-50 border-red-200 text-red-800', icon: <XCircle className="w-5 h-5 text-red-500" /> },
+        Fire: { container: 'bg-orange-50 border-orange-200 text-orange-800', icon: <AlertCircle className="w-5 h-5 text-orange-500" /> },
+        Medical: { container: 'bg-green-50 border-green-200 text-green-800', icon: <CheckCircle2 className="w-5 h-5 text-green-500" /> },
+        'Suspicious Activity': { container: 'bg-blue-50 border-blue-200 text-blue-800', icon: <Info className="w-5 h-5 text-blue-500" /> },
+        default: { container: 'bg-slate-50 border-slate-200 text-slate-700', icon: <Info className="w-5 h-5 text-slate-500" /> },
     };
 
     if (!token) {
@@ -70,23 +76,40 @@ const MyAlerts = () => {
                             <p className="text-gray-400">You haven't posted any alerts yet.</p>
                         </div>
                     ) : (
-                        alerts.map(alert => (
-                            <div 
-                                key={alert._id} 
-                                className={`flex items-start p-4 border rounded-lg shadow-sm ${alertStyles[alert.type]?.container || 'bg-gray-50'}`}
-                            >
-                                <div className="mr-3 mt-0.5">
-                                    {alertStyles[alert.type]?.icon || <Info className="w-5 h-5" />}
+                        alerts.map(alert => {
+                            const style = alertStyles[alert.category] || alertStyles.default;
+                            return (
+                                <div 
+                                    key={alert._id} 
+                                    className={`flex flex-col gap-3 p-4 border rounded-lg shadow-sm ${style.container}`}
+                                >
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="mr-2 mt-0.5">{style.icon}</div>
+                                            <h3 className="font-bold text-sm uppercase tracking-tight">
+                                                {alert.title || alert.category || 'My Alert'}
+                                            </h3>
+                                        </div>
+                                        <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                                            {alert.category || 'General'}
+                                        </span>
+                                    </div>
+                                    <p className="text-slate-700 leading-relaxed">
+                                        {alert.description || alert.message || 'No description provided.'}
+                                    </p>
+                                    <div className="flex flex-wrap gap-3 text-[12px] text-slate-500">
+                                        <span className="flex items-center gap-1">
+                                            <MapPin className="w-4 h-4" />
+                                            {alert.location?.address || 'Location not specified'}
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Clock className="w-4 h-4" />
+                                            {new Date(alert.createdAt).toLocaleString()}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="font-bold text-sm uppercase tracking-tight">{alert.title || alert.type}</h3>
-                                    <p className="text-slate-700 my-1">{alert.message || alert.description}</p>
-                                    <span className="text-[10px] text-gray-400 font-medium">
-                                        {new Date(alert.createdAt).toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
               </div>
