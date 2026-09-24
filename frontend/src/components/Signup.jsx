@@ -16,83 +16,79 @@ export default function Signup() {
         setformData({ ...formData, [e.target.name]: e.target.value });
     };
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { name, email, password, location, role } = formData;
-    try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${API_URL}/api/sign_up`, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, location, role }) 
-        });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const { name, email, password, location, role } = formData;
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${API_URL}/api/sign_up`, { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, location, role }) 
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (response.ok) {
-            localStorage.setItem("userToken", data.token);
-            window.location.href ="/dashboard";
-        } else {
-            alert("Signup failed: " + data.error);
+            if (response.ok) {
+                localStorage.setItem("userToken", data.token);
+                window.location.href ="/dashboard";
+            } else {
+                alert("Signup failed: " + data.error);
+            }
+        } catch (error) {
+            console.error("Connection error:", error);
+            alert("Network error. Please try again.");
         }
-    } catch (error) {
-        console.error("Connection error:", error);
-        alert("Network error. Please try again.");
-    }
-};
+    };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
-            <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-slate-100">
-                {/* Header */}
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-12">
+            <div className="max-w-md w-full space-y-8 bg-slate-900 p-10 rounded-2xl shadow-2xl border border-slate-800">
                 <div className="text-center">
-                    <div className="mx-auto h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                    <div className="mx-auto h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/30">
                         <ShieldCheck className="text-white h-8 w-8" />
                     </div>
-                    <h2 className="mt-6 text-3xl font-extrabold text-slate-900">Create Account</h2>
-                    <p className="mt-2 text-sm text-slate-600">
+                    <h2 className="mt-6 text-3xl font-extrabold text-white">Create Account</h2>
+                    <p className="mt-2 text-sm text-slate-400">
                         Join your local community security network
                     </p>
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="space-y-4">
-                        {/* Name Input */}
                         <div className="relative">
                             <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                             <input
                                 name="name"
                                 type="text"
                                 required
-                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 placeholder="Full Name"
                                 value={formData.name}
                                 onChange={handleChange}
                             />
                         </div>
 
-                        {/* Email Input */}
                         <div className="relative">
                             <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                             <input
                                 name="email"
                                 type="email"
                                 required
-                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 placeholder="Email address"
                                 value={formData.email}
                                 onChange={handleChange}
                             />
                         </div>
 
-                        {/* Password Input */}
                         <div className="relative">
                             <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                             <input
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 required
-                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
@@ -105,25 +101,25 @@ const handleSubmit = async (e) => {
                                 {showPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
                             </button>
                         </div>
-                        {/* Location Input */}
+
                         <div className="relative">
                             <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
                             <input
                                 name="location"
                                 type="text"
                                 required
-                                className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                className="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-950/70 text-slate-100 placeholder-slate-500"
                                 placeholder="Neighborhood / Street Address"
                                 value={formData.location}
                                 onChange={handleChange}
                             />
                         </div>
-                        {/* Role Selection */}
+
                         <div className="relative">
                             <ShieldCheck className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
                             <select
                                 name="role"
-                                className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white text-slate-600"
+                                className="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-950/70 text-slate-200"
                                 value={formData.role}
                                 onChange={handleChange}
                             >
@@ -136,15 +132,15 @@ const handleSubmit = async (e) => {
                     <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-lg shadow-blue-200"
+                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-lg shadow-blue-900/30"
                         >
                             Get Started
                         </button>
                     </div>
 
                     <div className="text-center text-sm">
-                        <span className="text-slate-600">Already have an account? </span>
-                        <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                        <span className="text-slate-400">Already have an account? </span>
+                        <a href="/login" className="font-medium text-blue-400 hover:text-blue-300">
                             Log in
                         </a>
                     </div>
