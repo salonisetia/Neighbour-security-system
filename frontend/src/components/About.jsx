@@ -12,7 +12,7 @@ export default function About() {
                         <ShieldCheck className="w-12 h-12 text-blue-400" />
                         <div>
                             <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-slate-200 to-blue-400 bg-clip-text text-transparent">
-                                SafeNeighbor
+                                SafeNeighbour
                             </h1>
                             <p className="text-xl text-slate-300 mt-2 font-medium">Your Neighborhood Safety Network</p>
                         </div>
@@ -72,7 +72,7 @@ export default function About() {
                         <div className="space-y-3 p-6 rounded-2xl hover:bg-slate-800 transition">
                             <Mail className="w-12 h-12 text-emerald-400 mx-auto" />
                             <p className="text-white font-bold text-lg">Support</p>
-                            <p className="text-sm text-slate-300">hello@safeneighbor.com</p>
+                            <p className="text-sm text-slate-300">hello@SafeNeighbour.com</p>
                         </div>
                         <div className="space-y-3 p-6 rounded-2xl hover:bg-slate-800 transition">
                             <Users className="w-12 h-12 text-purple-400 mx-auto" />
@@ -83,7 +83,7 @@ export default function About() {
                 </div>
 
                 <p className="text-center text-sm text-slate-400 mt-16">
-                    © 2024 SafeNeighbor. Building safer communities.
+                    © 2024 SafeNeighbour. Building safer communities.
                 </p>
             </div>
         </div>

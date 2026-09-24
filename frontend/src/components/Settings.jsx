@@ -16,7 +16,7 @@ export default function Settings() {
                     (blue when logged in). Login or signup first!
                 </p>
                 <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6">
-                    <p className="text-sm text-blue-800 font-medium">💡 Tip: After login, click the user icon next to "SafeNeighbor" logo.</p>
+                    <p className="text-sm text-blue-800 font-medium">💡 Tip: After login, click the user icon next to "SafeNeighbour" logo.</p>
                 </div>
             </div>
         </div>

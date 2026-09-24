@@ -34,7 +34,7 @@ export default function Navbar() {
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold tracking-tight text-white">SafeNeighbor</span>
+                            <span className="text-lg font-bold tracking-tight text-white">SafeNeighbour</span>
                             <span className="hidden rounded-full border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-200 sm:inline-block">
                                 Security
                             </span>
