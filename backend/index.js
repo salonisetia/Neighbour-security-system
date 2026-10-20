@@ -33,56 +33,65 @@ app.use(express.json());
 // MongoDB connection with fallback
 const mongoURI = process.env.MONGO_URI || 'mongodb+srv://saloni:KEjr7FehAX3oaC8C@neighbourhood-security.kcujzhs.mongodb.net/security_db?retryWrites=true&w=majority';
 
-// ✅ Optimized MongoDB connection for Vercel Serverless
-mongoose.connect(mongoURI, {
-    serverSelectionTimeoutMS: 5000,
-    connectTimeoutMS: 10000 
-})
-  .then(() => console.log("✅ MongoDB Connected Successfully"))
-  .catch(err => console.log("❌ MongoDB Connection Error: ", err));
+mongoose.set('strictQuery', false);
 
-// Standard Auth Routes (Login, Signup)
-app.use('/api', authRoutes);
+const mongooseOptions = {
+    serverSelectionTimeoutMS: 10000,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 30000,
+};
 
-// ✅ API Route Mapping
-// These map the frontend requests to your standalone API files
-app.get('/api/get_announcements', getAnnouncementsHandler);
-app.post('/api/post_announcement', postAnnouncementHandler);
-
-app.get('/api/get_alert', getAlertsHandler); // Fixes the Dashboard loading issue
-app.post('/api/post_alert', postAlertHandler); // Fixes the Alert posting issue
-
-app.get('/api/get_my_alerts', getMyAlertsHandler);
-app.patch('/api/verify-alert/:id', verifyAlertHandler);
-
-// Health check + DB health
-app.get('/api/health', async (req, res) => {
+const startServer = async () => {
   try {
-    const userCount = await mongoose.connection.db.collection('users').countDocuments();
-    res.json({ 
-      status: 'OK', 
-      dbConnected: mongoose.connection.readyState === 1,
-      userCount,
-      message: 'Backend healthy'
-    });
-  } catch (error) {
-    res.status(500).json({ status: 'DB Error', error: error.message });
-  }
-});
+    await mongoose.connect(mongoURI, mongooseOptions);
+    console.log("✅ MongoDB Connected Successfully");
 
-app.get('/', (req, res) => {
-  res.send("🚀 Neighbor Security API is live! Visit /api/health");
-});
+    // Standard Auth Routes (Login, Signup)
+    app.use('/api', authRoutes);
+
+    // ✅ API Route Mapping
+    // These map the frontend requests to your standalone API files
+    app.get('/api/get_announcements', getAnnouncementsHandler);
+    app.post('/api/post_announcement', postAnnouncementHandler);
+    app.get('/api/get_alert', getAlertsHandler);
+    app.post('/api/post_alert', postAlertHandler);
+    app.get('/api/get_my_alerts', getMyAlertsHandler);
+    app.patch('/api/verify-alert/:id', verifyAlertHandler);
+
+    // Health check + DB health
+    app.get('/api/health', async (req, res) => {
+      try {
+        const userCount = await mongoose.connection.db.collection('users').countDocuments();
+        res.json({
+          status: 'OK',
+          dbConnected: mongoose.connection.readyState === 1,
+          userCount,
+          message: 'Backend healthy'
+        });
+      } catch (error) {
+        res.status(500).json({ status: 'DB Error', error: error.message });
+      }
+    });
+
+    app.get('/', (req, res) => {
+      res.send("🚀 Neighbor Security API is live! Visit /api/health");
+    });
+
+    const PORT = process.env.PORT || 5000;
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
+    }
+  } catch (err) {
+    console.error('❌ Failed to connect to MongoDB:', err);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 // Global error handler for unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
-
-// Local development server configuration
-if (process.env.NODE_ENV !== 'production') {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
-}
 
 module.exports = app; // Export for Vercel deployment
