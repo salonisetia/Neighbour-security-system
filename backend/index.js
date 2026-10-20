@@ -41,53 +41,68 @@ const mongooseOptions = {
     socketTimeoutMS: 30000,
 };
 
-const startServer = async () => {
-  try {
-    await mongoose.connect(mongoURI, mongooseOptions);
-    console.log("✅ MongoDB Connected Successfully");
-
-    // Standard Auth Routes (Login, Signup)
-    app.use('/api', authRoutes);
-
-    // ✅ API Route Mapping
-    // These map the frontend requests to your standalone API files
-    app.get('/api/get_announcements', getAnnouncementsHandler);
-    app.post('/api/post_announcement', postAnnouncementHandler);
-    app.get('/api/get_alert', getAlertsHandler);
-    app.post('/api/post_alert', postAlertHandler);
-    app.get('/api/get_my_alerts', getMyAlertsHandler);
-    app.patch('/api/verify-alert/:id', verifyAlertHandler);
-
-    // Health check + DB health
-    app.get('/api/health', async (req, res) => {
-      try {
-        const userCount = await mongoose.connection.db.collection('users').countDocuments();
-        res.json({
-          status: 'OK',
-          dbConnected: mongoose.connection.readyState === 1,
-          userCount,
-          message: 'Backend healthy'
-        });
-      } catch (error) {
-        res.status(500).json({ status: 'DB Error', error: error.message });
-      }
-    });
-
-    app.get('/', (req, res) => {
-      res.send("🚀 Neighbor Security API is live! Visit /api/health");
-    });
-
-    const PORT = process.env.PORT || 5000;
-    if (process.env.NODE_ENV !== 'production') {
-      app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
-    }
-  } catch (err) {
-    console.error('❌ Failed to connect to MongoDB:', err);
-    process.exit(1);
+let dbConnectionPromise;
+const connectToDatabase = () => {
+  if (mongoose.connection.readyState === 1) return Promise.resolve();
+  if (!dbConnectionPromise) {
+    dbConnectionPromise = mongoose.connect(mongoURI, mongooseOptions)
+      .then(() => console.log("✅ MongoDB Connected Successfully"))
+      .catch((error) => {
+        dbConnectionPromise = undefined;
+        throw error;
+      });
   }
+  return dbConnectionPromise;
 };
 
-startServer();
+app.use(async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    console.error('❌ Failed to connect to MongoDB:', error);
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
+
+// Standard Auth Routes (Login, Signup)
+app.use('/api', authRoutes);
+
+// API route mappings
+app.get('/api/get_announcements', getAnnouncementsHandler);
+app.post('/api/post_announcement', postAnnouncementHandler);
+app.get('/api/get_alert', getAlertsHandler);
+app.post('/api/post_alert', postAlertHandler);
+app.get('/api/get_my_alerts', getMyAlertsHandler);
+app.patch('/api/verify-alert/:id', verifyAlertHandler);
+
+app.get('/api/health', async (req, res) => {
+  try {
+    const userCount = await mongoose.connection.db.collection('users').countDocuments();
+    res.json({
+      status: 'OK',
+      dbConnected: mongoose.connection.readyState === 1,
+      userCount,
+      message: 'Backend healthy'
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'DB Error', error: error.message });
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send("🚀 Neighbor Security API is live! Visit /api/health");
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  connectToDatabase()
+    .then(() => app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`)))
+    .catch((error) => {
+      console.error('❌ Failed to connect to MongoDB:', error);
+      process.exit(1);
+    });
+}
 
 // Global error handler for unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
