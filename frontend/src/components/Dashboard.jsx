@@ -14,9 +14,7 @@ export default function Dashboard() {
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
     const [selectedAlert, setSelectedAlert] = useState(null);
     
-    // ✅ Setup the API URL from environment variables
-    // const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    const API_URL = 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     // Auth guard
     useEffect(() => {
