@@ -11,12 +11,26 @@ export default function Signup() {
         role: "resident"
     });
     const [showPassword, setShowPassword] = useState(false);
+    const [step, setStep] = useState(1);
+    const [passwordError, setPasswordError] = useState("");
 
     const handleChange = (e) => {
         setformData({ ...formData, [e.target.name]: e.target.value });
+        if (e.target.name === "password" || e.target.name === "confirmPassword") {
+            setPasswordError("");
+        }
     };
 
-    const handleSubmit = async (e) => {
+    const handleAccountSubmit = (e) => {
+        e.preventDefault();
+        if (formData.password !== formData.confirmPassword) {
+            setPasswordError("Passwords do not match.");
+            return;
+        }
+        setStep(2);
+    };
+
+    const handleProfileSubmit = async (e) => {
         e.preventDefault();
         const { name, email, password, location, role } = formData;
         try {
@@ -54,97 +68,157 @@ export default function Signup() {
                     </p>
                 </div>
 
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-4">
-                        <div className="relative">
-                            <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                            <input
-                                name="name"
-                                type="text"
-                                required
-                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="Full Name"
-                                value={formData.name}
-                                onChange={handleChange}
-                            />
+                <div className="mt-6 flex items-center justify-center gap-3 text-sm">
+                    <span className={step === 1 ? "font-semibold text-blue-400" : "text-slate-500"}>
+                        1. Account details
+                    </span>
+                    <span className="text-slate-600">—</span>
+                    <span className={step === 2 ? "font-semibold text-blue-400" : "text-slate-500"}>
+                        2. Neighborhood
+                    </span>
+                </div>
+
+                {step === 1 ? (
+                    <form className="mt-6 space-y-6" onSubmit={handleAccountSubmit}>
+                        <div className="space-y-4">
+                            <div className="relative">
+                                <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                                <input
+                                    name="name"
+                                    type="text"
+                                    required
+                                    className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    placeholder="Full Name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                                <input
+                                    name="email"
+                                    type="email"
+                                    required
+                                    className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    placeholder="Email address"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                                <input
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    placeholder="Password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                />
+                                <button
+                                    type="button"
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                    className="absolute right-3 top-3"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
+                                </button>
+                            </div>
+
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                                <input
+                                    name="confirmPassword"
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    aria-invalid={Boolean(passwordError)}
+                                    aria-describedby={passwordError ? "password-error" : undefined}
+                                    className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    placeholder="Confirm Password"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            {passwordError && (
+                                <p id="password-error" className="text-sm text-red-400" role="alert">
+                                    {passwordError}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="relative">
-                            <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                            <input
-                                name="email"
-                                type="email"
-                                required
-                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="Email address"
-                                value={formData.email}
-                                onChange={handleChange}
-                            />
-                        </div>
-
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                            <input
-                                name="password"
-                                type={showPassword ? "text" : "password"}
-                                required
-                                className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-slate-700 placeholder-slate-500 text-slate-100 bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-                            <button
-                                type="button"
-                                className="absolute right-3 top-3"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
-                            </button>
-                        </div>
-
-                        <div className="relative">
-                            <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-                            <input
-                                name="location"
-                                type="text"
-                                required
-                                className="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-950/70 text-slate-100 placeholder-slate-500"
-                                placeholder="Neighborhood / Street Address"
-                                value={formData.location}
-                                onChange={handleChange}
-                            />
-                        </div>
-
-                        <div className="relative">
-                            <ShieldCheck className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-                            <select
-                                name="role"
-                                className="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-950/70 text-slate-200"
-                                value={formData.role}
-                                onChange={handleChange}
-                            >
-                                <option value="resident">Resident</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
                         <button
                             type="submit"
                             className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-lg shadow-blue-900/30"
                         >
-                            Get Started
+                            Continue
                         </button>
-                    </div>
+                    </form>
+                ) : (
+                    <form className="mt-6 space-y-6" onSubmit={handleProfileSubmit}>
+                        <div className="space-y-4">
+                            <div className="relative">
+                                <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
+                                <input
+                                    name="location"
+                                    type="text"
+                                    required
+                                    className="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-950/70 text-slate-100 placeholder-slate-500"
+                                    placeholder="Neighborhood / Street Address"
+                                    value={formData.location}
+                                    onChange={handleChange}
+                                />
+                            </div>
 
-                    <div className="text-center text-sm">
+                            <div className="relative">
+                                <ShieldCheck className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
+                                <select
+                                    name="role"
+                                    className="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-950/70 text-slate-200"
+                                    value={formData.role}
+                                    onChange={handleChange}
+                                >
+                                    <option value="resident">Resident</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setStep(1)}
+                                className="w-1/3 flex justify-center py-3 px-4 border border-slate-700 text-sm font-semibold rounded-lg text-slate-200 hover:bg-slate-800 transition-colors"
+                            >
+                                Back
+                            </button>
+                            <button
+                                type="submit"
+                                className="w-2/3 flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-lg shadow-blue-900/30"
+                            >
+                                Create Account
+                            </button>
+                        </div>
+
+                        <div className="text-center text-sm">
+                            <span className="text-slate-400">Already have an account? </span>
+                            <a href="/login" className="font-medium text-blue-400 hover:text-blue-300">
+                                Log in
+                            </a>
+                        </div>
+                    </form>
+                )}
+
+                {step === 1 && (
+                    <div className="mt-6 text-center text-sm">
                         <span className="text-slate-400">Already have an account? </span>
                         <a href="/login" className="font-medium text-blue-400 hover:text-blue-300">
                             Log in
                         </a>
                     </div>
-                </form>
+                )}
             </div>
         </div>
     );
