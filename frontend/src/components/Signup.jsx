@@ -21,7 +21,7 @@ export default function Signup() {
         const { name, email, password, location, role } = formData;
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-            const response = await fetch(`${API_URL}/api/sign_up`, { 
+            const response = await fetch(`${API_URL}/api/signup`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password, location, role }) 
