@@ -61,8 +61,7 @@ export default function Dashboard() {
     const handlePostNews = async () => {
         if (!newsText.trim()) return;
         try {
-            // ✅ Fixed route name to match backend/index.js (post_announcement)
-            const response = await fetch(`${API_URL}/api/post_announcement`, {
+            const response = await fetch(`${API_URL}/api/post-announcement`, {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",

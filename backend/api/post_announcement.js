@@ -1,13 +1,9 @@
 const Announcement = require('../models/Announcement');
-const jwt = require('jsonwebtoken');
 
 const postAnnouncementHandler = async (req, res) => {
   try {
-    // Use req.user from authMiddleware
-    const user = req.user;
-    console.log('User from middleware:', user.role);
-    if (user.role !== 'admin') {
-      return res.status(403).json({ error: 'Admin access required - got role: ' + user.role });
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
     }
 
     const { message } = req.body;

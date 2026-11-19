@@ -7,8 +7,7 @@ export default function Signup() {
         email: "",
         password: "",
         confirmPassword: "",
-        location: "", 
-        role: "resident"
+        location: ""
     });
     const [showPassword, setShowPassword] = useState(false);
     const [step, setStep] = useState(1);
@@ -32,19 +31,20 @@ export default function Signup() {
 
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
-        const { name, email, password, location, role } = formData;
+        const { name, email, password, location } = formData;
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
             const response = await fetch(`${API_URL}/api/signup`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password, location, role }) 
+                body: JSON.stringify({ name, email, password, location })
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 localStorage.setItem("userToken", data.token);
+                localStorage.setItem("userRole", data.role);
                 window.location.href ="/dashboard";
             } else {
                 alert("Signup failed: " + data.error);
@@ -172,18 +172,6 @@ export default function Signup() {
                                 />
                             </div>
 
-                            <div className="relative">
-                                <ShieldCheck className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-                                <select
-                                    name="role"
-                                    className="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-950/70 text-slate-200"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                >
-                                    <option value="resident">Resident</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
                         </div>
 
                         <div className="flex gap-3">

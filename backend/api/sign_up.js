@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Uses the Master Blueprint
+const User = require('../models/User');
 const SECRET_KEY = process.env.JWT_SECRET || "SafeNeighbour_Primary_Secret_99#";
 
 const signupHandler = async (req, res) => {
     try {
-        const { name, email, password, location, role } = req.body;
+        const { name, email, password, location } = req.body;
         const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : email;
 
         const existingUser = await User.findOne({ email: normalizedEmail });
@@ -12,7 +12,13 @@ const signupHandler = async (req, res) => {
             return res.status(400).json({ error: "User already exists" });
         }
 
-        const newUser = new User({ name, email: normalizedEmail, password, location, role });
+        const newUser = new User({
+            name,
+            email: normalizedEmail,
+            password,
+            location,
+            role: 'resident'
+        });
         const savedUser =await newUser.save();
         console.log("DATA SAVED TO DB:", savedUser);
 

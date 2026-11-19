@@ -1,9 +1,9 @@
 const path = require('path');
 const { createRequire } = require('module');
-const backendRequire = createRequire(path.join(__dirname, 'backend', 'package.json'));
+const backendRequire = createRequire(path.join(__dirname, '..', 'package.json'));
 const mongoose = backendRequire('mongoose');
-const User = require('./backend/models/User');
-backendRequire('dotenv').config({ path: path.join(__dirname, 'backend', '.env') });
+const User = require('../models/User');
+backendRequire('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 async function createAdmin() {
   try {
@@ -17,7 +17,7 @@ async function createAdmin() {
     }
 
     await mongoose.connect(mongoURI);
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     const adminEmail = (process.env.ADMIN_EMAIL || 'admin@test.com').trim().toLowerCase();
     await User.findOneAndUpdate(
@@ -33,9 +33,9 @@ async function createAdmin() {
       },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     );
-    console.log(`✅ Admin account created or updated: ${adminEmail}`);
+    console.log(`Admin account created or updated: ${adminEmail}`);
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error(' Error:', error.message);
     process.exitCode = 1;
   } finally {
     await mongoose.connection.close();
